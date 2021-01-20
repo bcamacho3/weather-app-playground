@@ -1,48 +1,17 @@
 const request = require('request')
 
+const forecast = (latitude, longitude, callback) => {
+    const url = 'http://api.weatherstack.com/current?access_key=e84129bc20b99e3b1452c36379b4e3ff&query=' + latitude + ',' + longitude + '&units=f'
 
-
-//query
-
-
-const forecast = (location, callback ) => {
-    //weatherstack request base url
-    const weatherstackBaseURL = 'http://api.weatherstack.com/current'
-
-    //access key
-    const wsKey = '28884348d5ca9149b951e1dd695a5278'
-
-    const weatherUrl = weatherstackBaseURL + '?access_key=' + wsKey + '&query=' + location
-
-    request({ url: weatherUrl, json: true }, (error, response) => {
-        if(error) {
-            // there was an error
-            //console.log('There was an error')
-            callback( 'Unable to connect to weather service', undefined)
-
-        }else if(!response.body.error){
-            //connection error
-            //console.log('Could not connect to server')
-            callback(error, undefined)
-        }else {
-            //everything is ok
-            console.log(response.body)
-
-            callback(undefined, response)
-
+    request({ url: url, json: true }, (error, { body }) => {
+        if (error) {
+            callback('Unable to connect to weather service!', undefined)
+        } else if (body.error) {
+            callback('Unable to find location', undefined)
+        } else {
+            callback(undefined, body.current.weather_descriptions[0] + ". It is currently " + body.current.temperature + " degress out. It feels like " + body.current.feelslike + " degress out. The humidity is " + body.current.humidity + "%.")
         }
-
-    } )
-
-
+    })
 }
 
-// forecast(-75.7088, 44.1545, (error, data) => {
-//     console.log('Error', error)
-//     console.log('Data', data)
-// })
-
 module.exports = forecast
-
-//exports.forecast = forecast
-
